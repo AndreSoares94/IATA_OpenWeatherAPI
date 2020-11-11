@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script src="utils.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>Open Weather</h1>
+    <div>
+        <a href="/">check in</a> | <a href="/checkins">view checkins</a>
+    </div>
+    <div style="width:75%">
+		<canvas id="canvas"></canvas>
+    </div>
+    
+    <script>
+        var color = Chart.helpers.color;
+        window.chartColors = {
+            red: 'rgb(255, 99, 132)',
+            orange: 'rgb(255, 159, 64)',
+            yellow: 'rgb(255, 205, 86)',
+            green: 'rgb(75, 192, 192)',
+            blue: 'rgb(54, 162, 235)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)'
+        };
+
+        window.onload = async function() {
+            const response = await axios.get('/api');
+            var data_teste = [];
+            for (item of response.data) {
+                var date = new Date(item.timestamp).toLocaleString("en-US");
+                var temp = item.weather.main.temp;
+                data_teste.push({
+                    x: moment(date),
+                    y: temp
+                });
+            }
+            
+            console.log(data_teste);
+            var scatterChartData = {
+            datasets: [{
+                label: 'Temperaturas',
+                borderColor: window.chartColors.blue,
+                backgroundColor: color(window.chartColors.blue).alpha(0.9).rgbString(),
+                pointRadius: 4,
+                data: data_teste
+            }]
+            };
+
+            var ctx = document.getElementById('canvas').getContext('2d');
+            window.myScatter = new Chart(ctx, {
+                type: 'scatter',
+                data: scatterChartData,
+                options: {
+                    title: {
+                        display: true,
+                        text: 'Gráfico de Temperaturas'
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {callback: (value) => {return new Date(value).toLocaleString("en-US", {day: "numeric", month: "short", hour: "numeric"});}}
+                        }]
+                    }
+                }
+            });
+            console.log(scatterChartData.datasets[0].data);
+        };
+
+    </script>
+</body>
+</html>>
