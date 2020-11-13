@@ -7,11 +7,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/addons/p5.dom.min.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css" />
-    <title>Document</title>
+    <title>OpenWeather Logger</title>
   </head>
   <body>
-    <h1>Open Weather</h1>
-    <div><a href="/">check in</a> | <a href="/checkins">view checkins</a></div>
+    <div class="tabDiv">
+      <img class="Tab" src="Imagens/tab.jpg">
+    </div>
+    <div class="navBar">
+      <a class="active" href="/"><b>Check in</b></a>
+      <a href="/checkins"><b>View Activity</b></a>
+    </div>
     <p>
         The weather here at <span id="latitude"></span>&deg;,
         <span id="longitude"></span>&deg; also known as <span id="city"></span> is <span id="summary"></span> with

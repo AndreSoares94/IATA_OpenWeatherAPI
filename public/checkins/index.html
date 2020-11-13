@@ -3,19 +3,23 @@
 <head>
     <meta charset='utf-8'>
     <meta http-equiv='X-UA-Compatible' content='IE=edge'>
-    <title>Page Title</title>
+    <title>Temperature</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
     <script src="utils.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../style.css" />
 </head>
 <body>
-    <h1>Open Weather</h1>
-    <div>
-        <a href="/">check in</a> | <a href="/checkins">view checkins</a>
+    <div class="tabDiv">
+        <img class="Tab" src="../Imagens/tab.jpg">
     </div>
-    <div style="width:75%">
+    <div class="navBar">
+      <a href="/"><b>Check in</b></a>
+      <a class="active" href="/checkins"><b>View Activity</b></a>
+    </div>
+    <div style="width:100%">
 		<canvas id="canvas"></canvas>
     </div>
     
