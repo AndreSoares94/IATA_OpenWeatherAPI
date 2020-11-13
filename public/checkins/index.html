@@ -20,7 +20,10 @@
       <a class="active" href="/checkins"><b>View Activity</b></a>
     </div>
     <div style="width:100%">
-		<canvas id="canvas"></canvas>
+        <canvas id="canvas"></canvas>
+        <p id="media"></p>
+        <p id="max_temp"></p>
+        <p id="min_temp"></p>
     </div>
     
     <script>
@@ -35,12 +38,20 @@
             grey: 'rgb(201, 203, 207)'
         };
 
+        var media = 0;
+        var total_media = 0;
+        var max = -20;
+        var min = 50;
         window.onload = async function() {
             const response = await axios.get('/api');
             var data_teste = [];
             for (item of response.data) {
                 var date = new Date(item.timestamp).toLocaleString("en-US");
                 var temp = item.weather.main.temp;
+                media += temp;
+                total_media++;
+                if(temp >= max) max = temp;
+                if(temp <= min) min = temp;
                 data_teste.push({
                     x: moment(date),
                     y: temp
@@ -75,6 +86,9 @@
                 }
             });
             console.log(scatterChartData.datasets[0].data);
+            document.getElementById("media").innerHTML =  "Média de Temperaturas:" + media/total_media;
+            document.getElementById("max_temp").innerHTML =  "Temperatura mais alta registada:" + max;
+            document.getElementById("min_temp").innerHTML =  "Temperatura mais baixa registada:" + min;
         };
 
     </script>
