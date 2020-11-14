@@ -2,7 +2,7 @@ p {
   padding: 10px;
 }
 p.mainInfo{
-font-size: larger;
+font-size: 200%;
 text-align: center;
 }
 div.mainInfo{
@@ -43,8 +43,8 @@ div.navBar a.active {
   color:black;
 }
 img.iconC{
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   display: block;
   margin-left: auto;
   margin-right: auto;
