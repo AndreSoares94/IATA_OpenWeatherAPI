@@ -8,8 +8,6 @@ if ('geolocation' in navigator) {
             lat = position.coords.latitude;
             lon = position.coords.longitude;
             console.log(lat, lon);
-            document.getElementById('latitude').textContent = lat;
-            document.getElementById('longitude').textContent = lon;
             const api_url = `weather/${lat},${lon}`;
             const response = await fetch(api_url);
             const json = await response.json();
@@ -18,7 +16,13 @@ if ('geolocation' in navigator) {
             document.getElementById('summary').textContent = weather.weather[0].description;
             document.getElementById('temp').textContent = weather.main.temp;
             document.getElementById('city').textContent = weather.name;
-
+            document.getElementById('speed').textContent = weather.wind.speed;
+            document.getElementById('humidity').textContent = weather.main.humidity;
+            console.log(json);
+            
+            var iconPng = weather.weather[0].icon;
+            var iconUrl = "http://openweathermap.org/img/w/" + iconPng + ".png";
+            document.getElementById('icon1').src = iconUrl;
         } catch (error) {
             console.log('something went wrong');
         }
