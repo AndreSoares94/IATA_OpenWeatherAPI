@@ -28,6 +28,7 @@
     </div>
     <div style="width:75%">
         <p>Tabela de leituras:</p>
+        <button onclick="hideTable()">Click Me to hide table</button>
         <table id="myTable" border="1px solid black"></table>
     </div>
     
@@ -47,6 +48,8 @@
         var total_media = 0;
         var max = -20;
         var min = 50;
+        var date_min = 0;
+        var date_max = 0;
         var tablerow = 1;
         window.onload = async function() {
             const response = await axios.get('/api');
@@ -84,8 +87,8 @@
                 /**calculo de medias e max/mins **/
                 media += temp;
                 total_media++;
-                if(temp >= max) max = temp;
-                if(temp <= min) min = temp;
+                if(temp >= max) {max = temp; date_max = date;}
+                if(temp <= min) {min = temp; date_min = date;}
 
                 /** insercao dos dados nos datasets de temperatura e vento **/
                 data_temperature.push({
@@ -119,7 +122,7 @@
             }]};
             
 
-            /** criaçao do grafico de temperatura **/
+            /** grafico de temperatura **/
             var chart_temp = document.getElementById('canvas_temp').getContext('2d');
             window.scatter_temp = new Chart(chart_temp, {
                 type: 'scatter',
@@ -142,6 +145,7 @@
                 }
             });
 
+            /** grafico do vento **/
             var chart_wind = document.getElementById('canvas_wind').getContext('2d');
             window.scatter_wind = new Chart(chart_wind, {
                 type: 'scatter',
@@ -164,10 +168,19 @@
                 }
             });
 
-            document.getElementById("media").innerHTML =  "Média de Temperaturas:" + media/total_media;
-            document.getElementById("max_temp").innerHTML =  "Temperatura mais alta registada:" + max;
-            document.getElementById("min_temp").innerHTML =  "Temperatura mais baixa registada:" + min;
+            document.getElementById("media").innerHTML =  "Média de Temperaturas: " + Math.round(media/total_media * 100) / 100 + "ºC";
+            document.getElementById("max_temp").innerHTML =  "Temperatura mais alta registada: " + max + "ºC no dia: " + date_max;
+            document.getElementById("min_temp").innerHTML =  "Temperatura mais baixa registada: " + min + "ºC no dia: " + date_min;
         };
+
+        function hideTable() {
+            var x = document.getElementById("myTable");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
 
     </script>
 </body>
