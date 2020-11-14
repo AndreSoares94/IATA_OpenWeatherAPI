@@ -1,0 +1,188 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Temperature</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script src="utils.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../style.css" />
+</head>
+<body>
+    <div class="tabDiv">
+        <img class="Tab" src="../Imagens/tab.jpg">
+    </div>
+    <div class="navBar">
+        <a href="/"><b>Check in</b></a>
+        <a class="active" href="/checkins"><b>View Activity</b></a>
+        <a href="/logger"><b>Key Metrics</b></a>
+    </div>
+    <div style="width:75%">
+        <canvas id="canvas_temp" style="background-color: #e6e6e6;"></canvas>
+        <p id="media"></p>
+        <p id="max_temp"></p>
+        <p id="min_temp"></p>
+        <canvas id="canvas_wind" style="background-color: #e6e6e6;"></canvas>
+    </div>
+    <div style="width:75%">
+        <p>Tabela de leituras:</p>
+        <button onclick="hideTable()">Click Me to hide table</button>
+        <table id="myTable" border="1px solid black"></table>
+    </div>
+    
+    <script>
+        var color = Chart.helpers.color;
+        window.chartColors = {
+            red: 'rgb(255, 99, 132)',
+            orange: 'rgb(255, 159, 64)',
+            yellow: 'rgb(255, 205, 86)',
+            green: 'rgb(75, 192, 192)',
+            blue: 'rgb(54, 162, 235)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)'
+        };
+
+        var media = 0;
+        var total_media = 0;
+        var max = -20;
+        var min = 50;
+        var date_min = 0;
+        var date_max = 0;
+        var tablerow = 1;
+        window.onload = async function() {
+            const response = await axios.get('/api');
+            var data_temperature = [];
+            var data_wind = [];
+            var table = document.getElementById("myTable");
+            var row_header = table.insertRow(0);
+            row_header.insertCell(0).outerHTML = "<th>Scanning Time</th><th>City</th><th>Temperature, ºC</th><th>Description</th><th>Vento, m/s</th><th>Atmos Pressure, hPa</th><th>Humidity, %</th><th>Clouds, %</th>";
+
+            for (item of response.data) {
+                var row = table.insertRow(tablerow);
+
+                var date = new Date(item.timestamp).toLocaleString("en-US");
+                var temp = item.weather.main.temp;
+                var wind_speed = item.weather.wind.speed;
+
+                /** Inserir valores na tabela **/
+                var cell_date = row.insertCell(0)
+                var cell_city = row.insertCell(1);
+                var cell_temp = row.insertCell(2);
+                var cell_desc = row.insertCell(3);
+                var cell_wind = row.insertCell(4);
+                var cell_pressure = row.insertCell(5);
+                var cell_humidity = row.insertCell(6);
+                var cell_clouds = row.insertCell(7);
+                cell_date.innerHTML = date;
+                cell_city.innerHTML = item.weather.name;
+                cell_temp.innerHTML = temp;
+                cell_desc.innerHTML = item.weather.weather[0].description;
+                cell_wind.innerHTML = wind_speed;
+                cell_pressure.innerHTML = item.weather.main.pressure;
+                cell_humidity.innerHTML = item.weather.main.humidity;
+                cell_clouds.innerHTML = item.weather.clouds.all;
+
+                /**calculo de medias e max/mins **/
+                media += temp;
+                total_media++;
+                if(temp >= max) {max = temp; date_max = date;}
+                if(temp <= min) {min = temp; date_min = date;}
+
+                /** insercao dos dados nos datasets de temperatura e vento **/
+                data_temperature.push({
+                    x: moment(date),
+                    y: temp
+                });
+                data_wind.push({
+                    x: moment(date),
+                    y: wind_speed
+                });
+            }
+            
+            /** definicao do grafico de temperatura **/
+            var scatter_data_temperature = {
+            datasets: [{
+                label: 'Temperaturas',
+                borderColor: window.chartColors.blue,
+                backgroundColor: color(window.chartColors.black).alpha(0.9).rgbString(),
+                pointRadius: 4,
+                data: data_temperature
+            }]};
+            
+            /** grafico do vento **/
+            var scatter_data_wind = {
+            datasets: [{
+                label: 'Ventos',
+                borderColor: window.chartColors.blue,
+                backgroundColor: color(window.chartColors.black).alpha(0.9).rgbString(),
+                pointRadius: 4,
+                data: data_wind
+            }]};
+            
+
+            /** grafico de temperatura **/
+            var chart_temp = document.getElementById('canvas_temp').getContext('2d');
+            window.scatter_temp = new Chart(chart_temp, {
+                type: 'scatter',
+                data: scatter_data_temperature,
+                options: {
+                    title: {
+                        display: true,
+                        text: 'Gráfico de Temperaturas em ºC'
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {callback: (value) => {return new Date(value).toLocaleString("en-US", {day: "numeric", month: "short", hour: "numeric"});}}
+                        }]
+                    },
+                    tooltips:{
+                        callbacks: {
+                            label: (tooltipItem, data) => {return new Date(tooltipItem.xLabel).toLocaleString("en-US", {day: "numeric", month: "short", hour: "numeric", minute: "numeric"}) + ' , '+tooltipItem.yLabel + ' ºC';}
+                        }
+                    }
+                }
+            });
+
+            /** grafico do vento **/
+            var chart_wind = document.getElementById('canvas_wind').getContext('2d');
+            window.scatter_wind = new Chart(chart_wind, {
+                type: 'scatter',
+                data: scatter_data_wind,
+                options: {
+                    title: {
+                        display: true,
+                        text: 'Gráfico de Velocidade do Vento em m/s'
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {callback: (value) => {return new Date(value).toLocaleString("en-US", {day: "numeric", month: "short", hour: "numeric"});}}
+                        }]
+                    },
+                    tooltips:{
+                        callbacks: {
+                            label: (tooltipItem, data) => {return new Date(tooltipItem.xLabel).toLocaleString("en-US", {day: "numeric", month: "short", hour: "numeric", minute: "numeric"}) + ' , '+tooltipItem.yLabel;}
+                        }
+                    }
+                }
+            });
+
+            document.getElementById("media").innerHTML =  "Média de Temperaturas: " + Math.round(media/total_media * 100) / 100 + "ºC";
+            document.getElementById("max_temp").innerHTML =  "Temperatura mais alta registada: " + max + "ºC no dia: " + date_max;
+            document.getElementById("min_temp").innerHTML =  "Temperatura mais baixa registada: " + min + "ºC no dia: " + date_min;
+        };
+
+        function hideTable() {
+            var x = document.getElementById("myTable");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+    </script>
+</body>
+</html>>

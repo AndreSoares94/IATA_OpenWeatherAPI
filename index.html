@@ -1,0 +1,52 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style media="screen">
+      .weather-warning {
+        background-color: orange;
+        color: #fff;
+        text-align: center;
+      }
+    </style>
+    <title>OpenWeather Logger</title>
+  </head>
+  <body>
+    <div class="tabDiv">
+      <img class="Tab" src="Imagens/tab.jpg">
+    </div>
+    <div class="navBar">
+        <a class="active" href="/"><b>Check in</b></a>
+        <a href="checkins"><b>View Activity</b></a>
+        <a href="logger"><b>Key Metrics</b></a>
+    </div>
+    <div class="mainInfo">
+      <img class="iconC" src="" id ="icon1">
+      <p class="mainInfo">
+        <b>Weather in <span id="city"></span>:</b>
+      </p>
+      <p class="mainInfo">
+        <span id="summary"></span>
+      </p>
+      <p class="mainInfo">
+        Temperature: <span id="temp"></span>&deg; C.
+      </p>
+      <p class="mainInfo">
+        Wind: <span id="speed"></span>
+      </p>
+      <p class="mainInfo">
+        Humidity: <span id="humidity"></span>
+      </p>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/addons/p5.dom.min.js"></script>
+    <script src="sketch.js"></script>
+  </body>
+</html>
