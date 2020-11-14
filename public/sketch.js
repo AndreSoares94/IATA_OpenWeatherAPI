@@ -18,7 +18,6 @@ if ('geolocation' in navigator) {
             document.getElementById('summary').textContent = weather.weather[0].description;
             document.getElementById('temp').textContent = weather.main.temp;
             document.getElementById('city').textContent = weather.name;
-            console.log(json);
 
         } catch (error) {
             console.log('something went wrong');
