@@ -44,9 +44,9 @@ app.get('/api', (request, response) => {
 });
 
 /**
- * Setting up api to the client send data, he going to get the data (POST) in /api
+ * Setting up the api to send data to the client, the client's going to get the data (POST) in localhost/api
  * request is what the client send us
- * response is our response to the client (sending back the info in json)
+ * response is our response to the client (sending back the info in json to /api)
  */
 app.post('/api', (request, response) => {
    const data = request.body;

@@ -1,7 +1,7 @@
 {
   "name": "module2",
   "version": "1.0.0",
-  "description": "This is the data selfie app",
+  "description": "This is an openweather forecast app",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

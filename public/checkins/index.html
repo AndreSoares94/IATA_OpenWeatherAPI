@@ -87,7 +87,7 @@
                 if(temp >= max) max = temp;
                 if(temp <= min) min = temp;
 
-                /** insercao dos dados nos datasets **/
+                /** insercao dos dados nos datasets de temperatura e vento **/
                 data_temperature.push({
                     x: moment(date),
                     y: temp
@@ -98,6 +98,7 @@
                 });
             }
             
+            /** definicao do grafico de temperatura **/
             var scatter_data_temperature = {
             datasets: [{
                 label: 'Temperaturas',
@@ -107,6 +108,7 @@
                 data: data_temperature
             }]};
             
+            /** grafico do vento **/
             var scatter_data_wind = {
             datasets: [{
                 label: 'Ventos',
@@ -117,6 +119,7 @@
             }]};
             
 
+            /** criaçao do grafico de temperatura **/
             var chart_temp = document.getElementById('canvas_temp').getContext('2d');
             window.scatter_temp = new Chart(chart_temp, {
                 type: 'scatter',
@@ -124,12 +127,17 @@
                 options: {
                     title: {
                         display: true,
-                        text: 'Gráfico de Temperaturas'
+                        text: 'Gráfico de Temperaturas em ºC'
                     },
                     scales: {
                         xAxes: [{
                             ticks: {callback: (value) => {return new Date(value).toLocaleString("en-US", {day: "numeric", month: "short", hour: "numeric"});}}
                         }]
+                    },
+                    tooltips:{
+                        callbacks: {
+                            label: (tooltipItem, data) => {return new Date(tooltipItem.xLabel).toLocaleString("en-US", {day: "numeric", month: "short", hour: "numeric", minute: "numeric"}) + ' , '+tooltipItem.yLabel + ' ºC';}
+                        }
                     }
                 }
             });
@@ -141,12 +149,17 @@
                 options: {
                     title: {
                         display: true,
-                        text: 'Gráfico de Velocidade do Vento'
+                        text: 'Gráfico de Velocidade do Vento em m/s'
                     },
                     scales: {
                         xAxes: [{
                             ticks: {callback: (value) => {return new Date(value).toLocaleString("en-US", {day: "numeric", month: "short", hour: "numeric"});}}
                         }]
+                    },
+                    tooltips:{
+                        callbacks: {
+                            label: (tooltipItem, data) => {return new Date(tooltipItem.xLabel).toLocaleString("en-US", {day: "numeric", month: "short", hour: "numeric", minute: "numeric"}) + ' , '+tooltipItem.yLabel;}
+                        }
                     }
                 }
             });
