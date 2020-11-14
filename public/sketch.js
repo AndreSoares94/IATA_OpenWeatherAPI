@@ -1,3 +1,4 @@
+
 //GEO LOCATE
 let lat, lon
 if ('geolocation' in navigator) {
@@ -19,7 +20,15 @@ if ('geolocation' in navigator) {
             document.getElementById('speed').textContent = weather.wind.speed;
             document.getElementById('humidity').textContent = weather.main.humidity;
             console.log(json);
-            
+
+            var temp = weather.main.temp;
+
+            //console.log(temp);
+
+            if (temp > 35) {
+              $('body').prepend('<div class="weather-warning"><p><span class="fa fa-sun-o"></span> High Temperature</p></div>');
+            }
+
             var iconPng = weather.weather[0].icon;
             var iconUrl = "http://openweathermap.org/img/w/" + iconPng + ".png";
             document.getElementById('icon1').src = iconUrl;
@@ -38,7 +47,7 @@ if ('geolocation' in navigator) {
         const db_response = await fetch('/api', options);
         const db_json = await db_response.json();
         console.log(db_json);
-            
+
     });
 } else {
     console.log('geolocation not available');
