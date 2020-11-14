@@ -20,10 +20,11 @@
       <a class="active" href="/checkins"><b>View Activity</b></a>
     </div>
     <div style="width:100%">
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas_temp"></canvas>
         <p id="media"></p>
         <p id="max_temp"></p>
         <p id="min_temp"></p>
+        <canvas id="canvas_wind"></canvas>
     </div>
     
     <script>
@@ -44,33 +45,81 @@
         var min = 50;
         window.onload = async function() {
             const response = await axios.get('/api');
-            var data_teste = [];
+            var data_temperature = [];
+            var data_wind = [];
             for (item of response.data) {
                 var date = new Date(item.timestamp).toLocaleString("en-US");
                 var temp = item.weather.main.temp;
+                var wind_speed = item.weather.wind.speed;
                 media += temp;
                 total_media++;
                 if(temp >= max) max = temp;
                 if(temp <= min) min = temp;
-                data_teste.push({
+                data_temperature.push({
                     x: moment(date),
                     y: temp
                 });
+                data_wind.push({
+                    x: moment(date),
+                    y: wind_speed
+                });
             }
             
-            console.log(data_teste);
-            var scatterChartData = {
+            var scatter_data_temperature = {
             datasets: [{
                 label: 'Temperaturas',
                 borderColor: window.chartColors.blue,
                 backgroundColor: color(window.chartColors.blue).alpha(0.9).rgbString(),
                 pointRadius: 4,
-                data: data_teste
-            }]
-            };
+                data: data_temperature
+            }]};
+            
+            var scatter_data_wind = {
+            datasets: [{
+                label: 'Ventos',
+                borderColor: window.chartColors.green,
+                backgroundColor: color(window.chartColors.blue).alpha(0.9).rgbString(),
+                pointRadius: 4,
+                data: data_wind
+            }]};
+            
 
-            var ctx = document.getElementById('canvas').getContext('2d');
-            window.myScatter = new Chart(ctx, {
+            var chart_temp = document.getElementById('canvas_temp').getContext('2d');
+            window.scatter_temp = new Chart(chart_temp, {
+                type: 'scatter',
+                data: scatter_data_temperature,
+                options: {
+                    title: {
+                        display: true,
+                        text: 'Gráfico de Temperaturas'
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {callback: (value) => {return new Date(value).toLocaleString("en-US", {day: "numeric", month: "short", hour: "numeric"});}}
+                        }]
+                    }
+                }
+            });
+
+            var chart_wind = document.getElementById('canvas_wind').getContext('2d');
+            window.scatter_wind = new Chart(chart_wind, {
+                type: 'scatter',
+                data: scatter_data_wind,
+                options: {
+                    title: {
+                        display: true,
+                        text: 'Gráfico de Velocidade do Vento'
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {callback: (value) => {return new Date(value).toLocaleString("en-US", {day: "numeric", month: "short", hour: "numeric"});}}
+                        }]
+                    }
+                }
+            });
+/*
+            var ctx1 = document.getElementById('canvas').getContext('2d');
+            window.myScatter1 = new Chart(ctx1, {
                 type: 'scatter',
                 data: scatterChartData,
                 options: {
@@ -84,8 +133,8 @@
                         }]
                     }
                 }
-            });
-            console.log(scatterChartData.datasets[0].data);
+            });*/
+            
             document.getElementById("media").innerHTML =  "Média de Temperaturas:" + media/total_media;
             document.getElementById("max_temp").innerHTML =  "Temperatura mais alta registada:" + max;
             document.getElementById("min_temp").innerHTML =  "Temperatura mais baixa registada:" + min;
