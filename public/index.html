@@ -19,6 +19,11 @@
   <body>
     <div class="tabDiv">
       <img class="Tab" src="Imagens/tab.jpg">
+      <div class="search-location">
+        <form action="" method="post" class="searchform" id="searchform">
+          <input type="text" name="search-location" >
+        </form>
+      </div>
     </div>
     <div class="navBar">
         <a class="active" href="/"><b>Check in</b></a>
@@ -48,5 +53,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.8.0/addons/p5.dom.min.js"></script>
     <script src="sketch.js"></script>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCQf6zxSFVLh9SE6iyA6zhbkIRJT3od7qQ&libraries=places"></script>
+        <script type="text/javascript" src="jquery.geocomplete.min.js"></script>
   </body>
 </html>

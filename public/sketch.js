@@ -29,6 +29,22 @@ if ('geolocation' in navigator) {
               $('body').prepend('<div class="weather-warning"><p><span class="fa fa-sun-o"></span> High Temperature</p></div>');
             }
 
+            $(document).ready(function(){
+
+$('input[name="search-location"]').geocomplete({
+	details: "form.searchform",
+	detailsAttribute: "data-geo",
+	types: ["geocode", "establishment"],
+												   });
+
+	$('input[name="search-location"]').geocomplete().bind("geocode:result", function(event, result){
+    console.log(result['name']);
+
+		$('input[name="street-address"]').val(result['name']);
+
+  });
+		});
+
             var iconPng = weather.weather[0].icon;
             var iconUrl = "http://openweathermap.org/img/w/" + iconPng + ".png";
             document.getElementById('icon1').src = iconUrl;
