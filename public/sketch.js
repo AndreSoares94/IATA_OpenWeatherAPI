@@ -1,6 +1,8 @@
-
+//iata_2020
+//123789aa
 //GEO LOCATE
 let lat, lon
+var temperat = 0;
 if ('geolocation' in navigator) {
     console.log('geolocation available');
     navigator.geolocation.getCurrentPosition( async position => {
@@ -20,6 +22,7 @@ if ('geolocation' in navigator) {
             document.getElementById('speed').textContent = weather.wind.speed;
             document.getElementById('humidity').textContent = weather.main.humidity;
             console.log(json);
+            temperat = weather.main.temp;
 
             var temp = weather.main.temp;
 
@@ -31,19 +34,19 @@ if ('geolocation' in navigator) {
 
             $(document).ready(function(){
 
-$('input[name="search-location"]').geocomplete({
-	details: "form.searchform",
-	detailsAttribute: "data-geo",
-	types: ["geocode", "establishment"],
-												   });
+                $('input[name="search-location"]').geocomplete({
+                    details: "form.searchform",
+                    detailsAttribute: "data-geo",
+                    types: ["geocode", "establishment"],
+                                                                });
 
-	$('input[name="search-location"]').geocomplete().bind("geocode:result", function(event, result){
-    console.log(result['name']);
+                    $('input[name="search-location"]').geocomplete().bind("geocode:result", function(event, result){
+                    console.log(result['name']);
 
-		$('input[name="street-address"]').val(result['name']);
+                        $('input[name="street-address"]').val(result['name']);
 
-  });
-		});
+                });
+		    });
 
             var iconPng = weather.weather[0].icon;
             var iconUrl = "http://openweathermap.org/img/w/" + iconPng + ".png";
@@ -64,7 +67,43 @@ $('input[name="search-location"]').geocomplete({
         const db_json = await db_response.json();
         console.log(db_json);
 
+        //create a client instance
+        client = new Paho.MQTT.Client("io.adafruit.com", Number(443), "JS_Client");
+        //set callback handlers
+        client.onConnectionLost = onConnectionLost;
+        client.onMessageArrived = onMessageArrived;
+        //connect the client
+        client.connect({onSuccess:onConnect, userName:"iata_2020",
+        password:"aio_oAxh01cDajiwSIUoNqkzGtVvqBjj", useSSL:true, mqttVersion:4});
+
     });
 } else {
     console.log('geolocation not available');
+}
+
+
+
+//called when the client connects
+function onConnect() {
+    console.log("onConnect");
+    //subscribe
+    client.subscribe("iata_2020/feeds/temperature_feed");
+    var temps = temperat.toString();
+    message = new Paho.MQTT.Message(temps);
+    message.destinationName = "iata_2020/feeds/temperature_feed";
+    client.send(message);
+}
+
+    //called when the client loses its connection
+function onConnectionLost(responseObject) {
+    if (responseObject.errorCode !== 0) {
+        console.log("onConnectionLost:" + responseObject.errorMessage);
+    }
+}
+//called when a message arrives
+function onMessageArrived(message) {
+    console.log("onMessageArrived:" + message.payloadString);
+    var h1 = document.createElement("h1");
+    h1.appendChild(document.createTextNode(message.payloadString));
+    document.body.appendChild(h1);
 }
