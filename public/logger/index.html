@@ -1,104 +1,246 @@
 ﻿<!DOCTYPE html>
 <html>
 
-    <head>
-        <meta charset='utf-8'>
-        <title>Read Text File</title>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
-        <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
-        <link rel="stylesheet" type="text/css" href="../style.css" />
-    </head>
+<head>
+    <meta charset='utf-8'>
+    <title>Read Text File</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+    <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script>
+    <link rel="stylesheet" type="text/css" href="../style.css" />
+    <style>
+        #pie {
+            float: left;
+            width: 50%;
+            overflow: hidden;
+        }
 
-    <body>
-        <div class="metDiv">
-            <img class="Met" src="../Imagens/metrics.jpg">
-        </div>
+        #table {
+            float: left;
+            width: 50%;
+            overflow: hidden;
+        }
+    </style>
+</head>
 
-        <div class="navBar">
-            <a href="/"><b>Check in</b></a>
-            <a href="/checkins"><b>View Activity</b></a>
-            <a class="active" href="/logger"><b>Key Metrics</b></a>
-        </div>
-        <br />
-        <div class="input">
-            <input type="file" name="inputfile" id="inputfile">
-        </div>
-        <br>
+<body>
+    <div class="metDiv">
+        <img class="Met" src="../Imagens/metrics.jpg">
+    </div>
 
-        <div style="width:75%">
-            <p>Top Teclas pressionadas:</p>
+    <div class="navBar">
+        <a href="/"><b>Check in</b></a>
+        <a href="/checkins"><b>View Activity</b></a>
+        <a class="active" href="/logger"><b>Key Metrics</b></a>
+    </div>
+    <br />
+    <div class="input">
+        <input type="file" name="inputfile" id="inputfile">
+    </div>
+    <br>
+
+    <div style="width:75%">
+        <p id="total_Press"></p>
+        <p id="total_Back"></p>
+        <p id="keys_per_sec"></p>
+    </div>
+
+    <div style="width:75%">
+        <div id="table">
+            <p id="top_teclas"></p>
             <table id="Top10_table" border="1px solid black"></table>
         </div>
-        <canvas id="Top10_chart" width="80" height="40"> </canvas>
+        <div id="pie">
+            <canvas id="pie_chart" width="80" height="40"> </canvas>
+        </div>
+    </div>
 
-        <script type="text/javascript">
-            var res;
-            const arr = [];
-            result = {};
-            k = []
+    <canvas id="pie_chart" width="80" height="40"> </canvas>
 
-            document.getElementById('inputfile')
-                .addEventListener('change', function () {
+    <script type="text/javascript">
+        var color = Chart.helpers.color;
+        window.chartColors = {
+            red: 'rgb(255, 99, 132)',
+            orange: 'rgb(255, 159, 64)',
+            yellow: 'rgb(255, 205, 86)',
+            green: 'rgb(75, 192, 192)',
+            blue: 'rgb(54, 162, 235)',
+            purple: 'rgb(153, 102, 255)',
+            grey: 'rgb(201, 203, 207)'
+        };
+        var res;
+        const arr = [];
+        const t = [];
+        result = {};
+        k =[];
 
-                    var fr = new FileReader();
-                    fr.onload = function () {
-                        /**Parse do ficheiro JSON**/
-                        res = JSON.parse(fr.result);
-                        
-                        const v = Object.entries(res);
+        var lh = [];
+        var rh = [];
 
-                        /**Pôr o timestamp e a key**/
-                        for (let i = 0; i < v.length; i++) {
-                            arr[i] = v[i][1].Key;
-                            //arr.forEach
+        lh.push("q", "w", "e", "r", "t", "a", "s", "d", "f", "g", "z", "x", "c", "v", "b");
+        lh.push("Q", "W", "E", "R", "T", "A", "S", "D", "F", "G", "Z", "X", "C", "V", "B");
+        lh.push("Key.tab", "Key.caps_lock", "Key.shift", "Key.ctrl_l", "Key.cmd", "Key.alt_l");
+
+        rh.push("y", "u", "i", "o", "p", "h", "j", "k", "l", "ç", "n", "m", ",", ".", "-");
+        rh.push("Y", "U", "I", "O", "P", "H", "J", "K", "L", "Ç", "N", "M");
+        rh.push("Key.ctrl_l", "Key.alt_gr", "Key.menu", "Key.ctrl_r", "Key.shift_r", "Key.enter", "º", "ª", "~", "^", "(", ")", "?");
+
+        console.log("lh: " + lh);
+        console.log("lh2: " + lh.includes("a" && "A"));
+        console.log("lh3: " + lh.includes("c"));
+
+
+
+        document.getElementById('inputfile')
+            .addEventListener('change', function () {
+
+                var fr = new FileReader();
+                fr.onload = function () {
+                    /**Parse do ficheiro JSON**/
+                    res = JSON.parse(fr.result);
+
+                    const v = Object.entries(res);
+
+                    /**Pôr o timestamp e a key**/
+                    for (let i = 0; i < v.length; i++) {
+                        arr[i] = v[i][1].Key;
+                        t[i] = v[i][1].Timestamp
+                        //arr.forEach
+
+                    }
+
+                    /**Criar objeto com as keys e o nº de vezes primidas**/
+                    let j = 0;
+                    for (var i = 0; i < arr.length; ++i) {
+                        if (!result[arr[i]]) {
+                            result[arr[i]] = 0;
+                            k[j] = arr[i];
+                            j++;
+                        }
+                        ++result[arr[i]];
+                    }
+
+                    //console.log(Object.entries(result).sort((a, b) => b[1] - a[1]));
+
+                    /** Ordenar por ordem decrescente as keys e seus valores**/
+                    Sorted = Object.keys(result).sort(function (a, b) { return result[a] - result[b] })
+                    Sorted_val = Object.values(result).sort(function (a, b) { return a - b })
+
+                    console.log(Sorted);
+
+                    console.log(Object.keys(result));
+                    console.log(Object.values(result));
+
+                    /**Calcular valor total de teclas pressionadas**/
+                    var tot = 0;
+                    var back = 0;
+                    var vel = 0.0;
+
+
+
+                    /**Criar Tabela e Inserir cabeçalho**/
+                    const table = document.getElementById("Top10_table");
+                    var row_header = table.insertRow(0);
+                    row_header.insertCell(0).outerHTML = "<th>Keys</th><th>Nr. de vezes pressionada</th>";
+                    var tablerow = 1;
+
+                    /**Inserir valores na tabela por ordem**/
+                    for (var i = 0; i < Object.keys(result).length; ++i) {
+                        var row = table.insertRow(tablerow);
+
+                        var x = row.insertCell(0);
+                        var y = row.insertCell(1);
+
+                        x.innerHTML = Sorted[i];
+                        y.innerHTML = Sorted_val[i];
+
+                        tot += parseInt(Object.values(result)[i]);
+
+                        if (Object.keys(result)[i].includes('backspace')) {
+
+                            back += parseInt(Object.values(result)[i]);
 
                         }
 
-                        /**Criar objeto com as keys e o nº de vezes primidas**/
-                        let j = 0;
-                        for (var i = 0; i < arr.length; ++i) {
-                            if (!result[arr[i]]) {
-                                result[arr[i]] = 0;
-                                k[j] = arr[i];
-                                j++;
+                    }
+
+                    /** Calcular velocidade de digitação através do nr. total de teclas pressionado
+                       e da diferença do tempo entra a ultima tecla premida e a ultima **/
+                    var fim = new Date(t[t.length - 1]).getTime();
+                    var ini = new Date(t[0]).getTime();
+
+                    vel = tot / Math.abs(fim - ini);
+
+                    document.getElementById("total_Press").innerHTML = "Total de teclas pressionadas: " + tot;
+                    document.getElementById("total_Back").innerHTML = "Total de caracteres apagados: " + back;
+                    document.getElementById("keys_per_sec").innerHTML = "Velocidade (Nr. de Teclas/segundo): " + vel;
+                    document.getElementById("top_teclas").innerHTML = "Top Teclas pressionadas:"
+
+                    var l_keys = 0;
+                    var r_keys = 0;
+                    var other_keys = 0;
+
+                    /**Calcular Nr de Keys pertencentes a cada grupo**/
+                    for (let i = 0; i < arr.length; i++) {
+                        if (lh.includes(arr[i])) {
+                            l_keys++;
+                        }
+                        else {
+                            if (rh.includes(arr[i])) {
+                                r_keys++;
                             }
-                            ++result[arr[i]];
-                        }
-
-                        //console.log(Object.entries(result).sort((a, b) => b[1] - a[1]));
-
-                        /** Ordenar por ordem decrescente as keys e seus valores**/
-                        Sorted = Object.keys(result).sort(function (a, b) { return result[a] - result[b] })
-                        Sorted_val = Object.values(result).sort(function (a, b) { return a - b })
-
-                        console.log(Sorted);
-
-                        console.log(Object.keys(result));
-                        console.log(Object.values(result));
-
-                        /**Criar Tabela e Inserir cabeçalho**/
-                        const table = document.getElementById("Top10_table");
-                        var row_header = table.insertRow(0);
-                        row_header.insertCell(0).outerHTML = "<th>Keys</th><th>Nr. de vezes pressionada</th>";
-                        var tablerow = 1;
-
-                        /**Inserir valores na tabela por ordem**/
-                        for (var i = 0; i < Object.keys(result).length; ++i) {
-                            var row = table.insertRow(tablerow);
-
-                            var x = row.insertCell(0);
-                            var y = row.insertCell(1);
-
-                            x.innerHTML = Sorted[i];
-                            y.innerHTML = Sorted_val[i];
-                            
+                            else {
+                                other_keys++;
+                            }
                         }
                     }
 
-                    fr.readAsText(this.files[0]);
-                })
-           
-        </script>
-    </body>
+                    /**Configurar pie chart**/
+                    var config = {
+                        type: 'pie',
+                        data: {
+                            datasets: [{
+                                data: [
+                                    (l_keys / tot) * 100,
+                                    (r_keys / tot) * 100,
+                                    (other_keys / tot) * 100,
+
+                                ],
+                                backgroundColor: [
+                                    color(window.chartColors.red).alpha(0.9).rgbString(),
+                                    color(window.chartColors.orange).alpha(0.9).rgbString(),
+                                    color(window.chartColors.blue).alpha(0.9).rgbString(),
+                                ],
+                                label: 'Dataset 1'
+                            }],
+                            labels: [
+                                'LH',
+                                'RH',
+                                'S/Others'
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            title: {
+                                display: true,
+                                text: 'Key Group Pressed Percentage'
+                            },
+                            
+                        }
+
+                    };
+
+                    var ctx = document.getElementById('pie_chart').getContext('2d');
+                    window.pie_chart = new Chart(ctx, config);
+
+
+
+
+                }
+                fr.readAsText(this.files[0]);
+            })
+
+    </script>
+</body>
 
 </html>

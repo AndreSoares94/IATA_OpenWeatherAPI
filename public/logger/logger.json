@@ -121,4 +121,5 @@
 {"Timestamp":1605324720,"Key": "x"},
 {"Timestamp":1605324720,"Key": "b"},
 {"Timestamp":1605324720,"Key": "a"},
-{"Timestamp":1605324720,"Key": "u"}]
+{"Timestamp":1605324720,"Key": "u"},
+{"Timestamp":1605324721,"Key": "Key.backspace"}]
