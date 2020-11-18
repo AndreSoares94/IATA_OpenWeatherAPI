@@ -43,7 +43,7 @@ if ('geolocation' in navigator) {
                     $('input[name="search-location"]').geocomplete().bind("geocode:result", function(event, result){
                     console.log(result['name']);
 
-                        $('input[name="street-address"]').val(result['name']);
+                        $('input[name="search-location"]').val(result['name']);
 
                 });
 		    });
